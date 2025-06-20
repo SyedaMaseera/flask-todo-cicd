@@ -1,25 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>To-Do List</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        ul { padding: 0; }
-        li { list-style-type: none; margin-bottom: 10px; }
-        input[type=text] { padding: 8px; width: 300px; }
-        button { padding: 8px 12px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Interactive To-Do Calendar</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      display: flex;
+      height: 100vh;
+    }
+    .container {
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 800px;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f7f7f7;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <h1>To-Do List</h1>
-    <form method="POST">
-        <input type="text" name="task" placeholder="Enter a task" required>
-        <button type="submit">Add</button>
-    </form>
-    <ul>
-        {% for todo in todos %}
-        <li>{{ todo }}</li>
-        {% endfor %}
-    </ul>
+  <div class="container">
+    <h1>🗓️ To-Do list</h1>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+      <input type="text" id="taskTitle" placeholder="Task title">
+      <input type="date" id="taskDate">
+      <button onclick="addTask()">➕ Add Task</button>
+    </div>
+
+    <h3>Tasks</h3>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    async function fetchTasks() {
+      const res = await fetch('/tasks');
+      const tasks = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.innerText = `${task.date}: ${task.title}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const title = document.getElementById('taskTitle').value;
+      const date = document.getElementById('taskDate').value;
+      if (!title || !date) return alert('Please enter both task and date');
+      await fetch('/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, date })
+      });
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskDate').value = '';
+      fetchTasks();
+    }
+
+    window.onload = fetchTasks;
+  </script>
 </body>
 </html>
+
+
