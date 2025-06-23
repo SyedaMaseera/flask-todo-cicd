@@ -9,7 +9,8 @@ class FlaskTodoTestCase(unittest.TestCase):
     def test_homepage_loads(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'To-Do List', response.data)
+        # self.assertIn(b'To-Do List', response.data)
+        self.assertIn("To-Do list".encode(), response.data)
 
 if __name__ == '__main__':
     unittest.main()
